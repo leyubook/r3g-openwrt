@@ -9,6 +9,7 @@ env:
   TZ: Asia/Shanghai
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -55,6 +56,20 @@ jobs:
         run: |
           cd openwrt
           [ -e ../diy-part2.sh ] && bash ../diy-part2.sh
+
+      - name: 修复下载脚本（GitHub 镜像加速）
+        run: |
+          cd openwrt
+          # 为 download.pl 添加 GitHub 镜像源，解决部分源码包 404 问题
+          # 在 @GITHUB handler 的 for 循环前插入镜像
+          perl -i -pe '
+            if (/\@GITHUB/ .. /for \(1 \.\. 5\)/) {
+              if (/for \(1 \.\. 5\)/ && !$done++) {
+                $_ = qq{\t\tpush \@mirrors, "https://ghproxy.net/https://github.com/\$1";\n\t\tpush \@mirrors, "https://gh-proxy.com/https://github.com/\$1";\n$_};
+              }
+            }
+          ' scripts/download.pl
+          echo "download.pl patched"
 
       - name: 下载所有源码包
         run: |
