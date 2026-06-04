@@ -17,6 +17,9 @@
 
 | 分类 | 组件 |
 |------|------|
+| **WiFi 2.4G** | kmod-mt7603 (MT7603E) |
+| **WiFi 5G** | kmod-mt76x2 (MT7612E) |
+| **WiFi 协议栈** | kmod-cfg80211, kmod-mac80211, wpad-basic-wolfssl |
 | **Android 手机 USB 网络** | kmod-usb-net-rndis, kmod-usb-net-cdc-ether, kmod-usb-net-cdc-ncm, kmod-usb-net-cdc-eem, kmod-usb-net-cdc-subset |
 | **iPhone USB 网络** | kmod-usb-net-ipheth, libusbmuxd, libimobiledevice, usbmuxd |
 | **华为手机 USB 网络** | kmod-usb-net-huawei-cdc-ncm |
