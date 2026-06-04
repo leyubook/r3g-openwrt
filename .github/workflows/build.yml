@@ -3,7 +3,7 @@ name: 小米R3G OpenWrt 云编译
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [master, main]
 
 env:
   TZ: Asia/Shanghai
