@@ -14,6 +14,9 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # 必须显式授予 contents: write，否则 action-gh-release 无法创建 tag 和 release
+    permissions:
+      contents: write
     steps:
       - name: 检出编译脚本
         uses: actions/checkout@v4
@@ -89,8 +92,44 @@ jobs:
           cp openwrt/bin/targets/ramips/mt7621/openwrt-ramips-mt7621-xiaomi_mi-router-3g-squashfs-rootfs0.bin release/ 2>/dev/null || true
           ls -lh release/
 
-      - name: 上传固件产物
+      - name: 生成版本号
+        run: |
+          SHORT_SHA=$(echo "$GITHUB_SHA" | head -c7)
+          echo "VERSION=$(date +%Y%m%d)-${SHORT_SHA}" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=r3g-$(date +%Y%m%d)-${SHORT_SHA}" >> "$GITHUB_ENV"
+
+      - name: 上传固件产物（Artifacts 备份）
         uses: actions/upload-artifact@v4
         with:
-          name: Xiaomi_R3G_OpenWrt_Firmware
+          name: Xiaomi_R3G_OpenWrt_Firmware_${{ env.VERSION }}
           path: release/
+
+      - name: 上传到 GitHub Releases
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: 小米R3G OpenWrt 固件 ${{ env.VERSION }}
+          body: |
+            ## 小米路由器 3G (MIR3G) OpenWrt 固件
+
+            - **编译时间**: ${{ env.VERSION }}
+            - **源码**: [Lean LEDE](https://github.com/coolsnowwolf/lede) master
+            - **集成插件**: OpenClash + AdGuard Home
+            - **默认 IP**: 192.168.123.1
+
+            ### 📥 刷机方式
+
+            | 文件 | 适用场景 |
+            |------|---------|
+            | `*sysupgrade.bin` | 已有 OpenWrt，系统升级 |
+            | `*kernel1.bin` | Breed 刷入（内核分区） |
+            | `*rootfs0.bin` | Breed 刷入（根文件系统） |
+
+            ### ⚠️ 注意
+
+            首次刷机请通过 Breed 刷入 kernel1 + rootfs0，或参考 [OpenWrt 官方 Wiki](https://openwrt.org/toh/xiaomi/mi_router_3g)。
+          files: release/*
+          draft: false
+          prerelease: false

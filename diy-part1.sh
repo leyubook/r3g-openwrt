@@ -7,3 +7,7 @@ echo 'src-git openclash https://github.com/vernesong/OpenClash' >>feeds.conf.def
 # AdGuard Home — 直接克隆到 package 目录
 # 该仓库是单包结构，不是 feed 格式，不能用 src-git
 git clone --depth 1 https://github.com/rufengsuixing/luci-app-adguardhome package/luci-app-adguardhome
+
+# Argon 主题配置面板 — 直接克隆到 package 目录
+# 该包不在任何 feed 中，需手动添加
+git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config package/luci-app-argon-config
