@@ -77,6 +77,17 @@ jobs:
           cd openwrt
           make download -j8 V=s
 
+      - name: 修复内核模块编译（gpio-button-hotplug GCC14 兼容）
+        run: |
+          cd openwrt
+          MK="package/kernel/gpio-button-hotplug/Makefile"
+          if [ -f "$MK" ]; then
+            sed -i 's/-Werror//g' "$MK"
+            echo "Patched gpio-button-hotplug Makefile to remove -Werror"
+          else
+            echo "::warning::gpio-button-hotplug Makefile not found"
+          fi
+
       - name: 编译固件
         run: |
           cd openwrt
