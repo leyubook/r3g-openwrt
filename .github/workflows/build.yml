@@ -102,12 +102,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Xiaomi_R3G_OpenWrt_Firmware_${{ env.VERSION }}
-          path: release/
+          path: release/*
+
+      - name: 检查固件文件是否存在
+        run: |
+          ls -lh release/
+          echo "File count: $(ls release/*.bin 2>/dev/null | wc -l)"
 
       - name: 上传到 GitHub Releases
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: 小米R3G OpenWrt 固件 ${{ env.VERSION }}
@@ -130,6 +133,7 @@ jobs:
             ### ⚠️ 注意
 
             首次刷机请通过 Breed 刷入 kernel1 + rootfs0，或参考 [OpenWrt 官方 Wiki](https://openwrt.org/toh/xiaomi/mi_router_3g)。
-          files: release/*
+          files: release/*.bin
+          fail_on_unmatched_files: true
           draft: false
           prerelease: false
