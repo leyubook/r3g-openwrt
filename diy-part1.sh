@@ -4,3 +4,10 @@
 # Argon 主题配置面板 — 直接克隆到 package 目录
 # 该包不在任何 feed 中，需手动添加
 git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config package/luci-app-argon-config
+
+# smartdns 核心
+# 官方仓库自带 OpenWrt 打包脚本 package/openwrt/Makefile
+git clone --depth 1 https://github.com/pymumu/smartdns.git package/smartdns
+
+# luci-app-smartdns 管理界面
+git clone --depth 1 https://github.com/pymumu/luci-app-smartdns.git package/luci-app-smartdns
