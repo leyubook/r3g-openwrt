@@ -79,47 +79,6 @@ jobs:
           cd openwrt
           make download -j8 V=s
 
-      - name: 预下载 AdGuardHome 核心（gh-proxy 镜像）
-        run: |
-          cd openwrt
-          # 设置自定义文件目录让 build 系统自动打包 files/ 到固件
-          echo 'CONFIG_TARGET_ROOTFS_CUSTOM_FILES_DIR="files"' >> .config
-          AGH_VERSION="v0.107.77"
-          AGH_FILE="AdGuardHome_linux_mipsle_softfloat.tar.gz"
-          AGH_URL="https://gh-proxy.com/https://github.com/AdguardTeam/AdGuardHome/releases/download/${AGH_VERSION}/${AGH_FILE}"
-          echo "Downloading ${AGH_URL}"
-          mkdir -p files/usr/bin
-          wget -q --timeout=30 --tries=3 "$AGH_URL" -O /tmp/agh.tar.gz
-          if [ -s /tmp/agh.tar.gz ]; then
-            tar -xzf /tmp/agh.tar.gz -C /tmp/
-            if [ -f /tmp/AdGuardHome/AdGuardHome ]; then
-              cp /tmp/AdGuardHome/AdGuardHome files/usr/bin/
-              chmod +x files/usr/bin/AdGuardHome
-              ls -lh files/usr/bin/AdGuardHome
-              echo "AdGuardHome core pre-downloaded successfully"
-            else
-              echo "::warning::AdGuardHome binary not found in extracted archive, listing /tmp/AdGuardHome:"
-              ls -la /tmp/AdGuardHome/ 2>/dev/null || echo "  (directory not found)"
-            fi
-          else
-            echo "::warning::AdGuardHome download failed (0 bytes), will rely on online update"
-          fi
-
-      - name: 替换下载链接为 gh-proxy 镜像
-        run: |
-          LINKS_FILE="package/luci-app-adguardhome/root/usr/share/AdGuardHome/links.txt"
-          if [ -f "$LINKS_FILE" ]; then
-            echo ">>> 原始 links.txt:"
-            cat "$LINKS_FILE"
-            # 在每条原始链接前插入对应的 gh-proxy 镜像链接
-            sed -i 's|^https://github.com/AdguardTeam/AdGuardHome/releases/download/|https://gh-proxy.com/https://github.com/AdguardTeam/AdGuardHome/releases/download/|' "$LINKS_FILE"
-            sed -i 's|^https://static.adguard.com/adguardhome/release/|https://gh-proxy.com/https://static.adguard.com/adguardhome/release/|' "$LINKS_FILE"
-            echo ">>> 替换后的 links.txt:"
-            cat "$LINKS_FILE"
-          else
-            echo "::warning::links.txt not found at $LINKS_FILE"
-          fi
-
       - name: 编译固件
         run: |
           cd openwrt
@@ -163,7 +122,7 @@ jobs:
 
             - **编译时间**: ${{ env.VERSION }}
             - **源码**: [Lean LEDE](https://github.com/coolsnowwolf/lede) master
-            - **集成插件**: OpenClash + AdGuard Home
+            - **集成插件**: Argon 主题
             - **默认 IP**: 192.168.123.1
 
             ### 📥 刷机方式
