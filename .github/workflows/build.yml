@@ -105,6 +105,21 @@ jobs:
             echo "::warning::AdGuardHome download failed (0 bytes), will rely on online update"
           fi
 
+      - name: 替换下载链接为 gh-proxy 镜像
+        run: |
+          LINKS_FILE="package/luci-app-adguardhome/root/usr/share/AdGuardHome/links.txt"
+          if [ -f "$LINKS_FILE" ]; then
+            echo ">>> 原始 links.txt:"
+            cat "$LINKS_FILE"
+            # 在每条原始链接前插入对应的 gh-proxy 镜像链接
+            sed -i 's|^https://github.com/AdguardTeam/AdGuardHome/releases/download/|https://gh-proxy.com/https://github.com/AdguardTeam/AdGuardHome/releases/download/|' "$LINKS_FILE"
+            sed -i 's|^https://static.adguard.com/adguardhome/release/|https://gh-proxy.com/https://static.adguard.com/adguardhome/release/|' "$LINKS_FILE"
+            echo ">>> 替换后的 links.txt:"
+            cat "$LINKS_FILE"
+          else
+            echo "::warning::links.txt not found at $LINKS_FILE"
+          fi
+
       - name: 编译固件
         run: |
           cd openwrt
