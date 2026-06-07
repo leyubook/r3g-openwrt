@@ -5,13 +5,12 @@
 # 该包不在任何 feed 中，需手动添加
 git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config package/luci-app-argon-config
 
-# smartdns 核心
-# 官方仓库的 OpenWrt 打包脚本在 package/openwrt/ 子目录下
-# 需要将打包文件移至 package/smartdns/ 根目录才能被构建系统识别
-git clone --depth 1 https://github.com/pymumu/smartdns.git package/smartdns
-cp -r package/smartdns/package/openwrt/* package/smartdns/
-cp -r package/smartdns/package/openwrt/.* package/smartdns/ 2>/dev/null || true
-rm -rf package/smartdns/package
+# smartdns 核心（OpenWrt 独立打包仓库，放入 feeds）
+# 官方说明: https://github.com/pymumu/openwrt-smartdns
+mkdir -p feeds/packages/net/smartdns
+git clone --depth 1 https://github.com/pymumu/openwrt-smartdns.git feeds/packages/net/smartdns
 
-# luci-app-smartdns 管理界面
-git clone --depth 1 https://github.com/pymumu/luci-app-smartdns.git package/luci-app-smartdns
+# luci-app-smartdns 管理界面（LEDE 必须用 lede 分支）
+# 官方说明: https://github.com/pymumu/luci-app-smartdns
+mkdir -p feeds/luci/applications/luci-app-smartdns
+git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns.git feeds/luci/applications/luci-app-smartdns
